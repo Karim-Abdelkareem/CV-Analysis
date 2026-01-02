@@ -52,9 +52,6 @@ const interviewSessionSchema = new mongoose.Schema(
       type: String,
       enum: ["male", "female", "neutral"],
     },
-    livekitRoomName: {
-      type: String,
-    },
     metadata: {
       technicalSkills: [String],
       yearsOfExperience: Number,

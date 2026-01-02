@@ -10,9 +10,4 @@ export const config = {
   jwt_expires_in: process.env.JWT_EXPIRES_IN || "90d",
   jwt_cookie_expires_in: process.env.JWT_COOKIE_EXPIRES_IN || 90,
   node_env: process.env.NODE_ENV || "development",
-  livekit: {
-    url: process.env.LIVEKIT_URL,
-    apiKey: process.env.LIVEKIT_API_KEY,
-    secret: process.env.LIVEKIT_API_SECRET,
-  },
 };
