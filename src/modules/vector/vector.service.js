@@ -3,7 +3,7 @@ import User from "../auth/user.model.js";
 import { AppError } from "../../utils/AppError.js";
 
 export async function queryDocuments(query, userId) {
-  // Get user's document IDs
+  // Check if user has uploaded CV (validation only)
   const user = await User.findById(userId);
   if (!user) {
     throw new AppError("User not found", 404);
@@ -18,27 +18,22 @@ export async function queryDocuments(query, userId) {
 
   const vectorStore = await getVectorStore();
 
-  // Perform similarity search with filter for user's document IDs
-  // Note: PineconeStore doesn't directly support filtering by IDs in similaritySearch
-  // So we'll use a workaround: search all and filter results
-  const results = await vectorStore.similaritySearch(query, 100); // Get more results to filter
+  const userIdStr = userId.toString();
 
-  // Filter results to only include user's document chunks
-  const userResults = results.filter((result) => {
-    const resultId = result.id || "";
-    return user.document.chunksIds.includes(resultId);
+  // Use Pinecone's native metadata filtering with topK
+  // No manual filtering needed - Pinecone handles all filtering natively
+  const results = await vectorStore.similaritySearch(query, 3, {
+    userId: userIdStr,
   });
 
-  // Limit to top 3 results
-  const topResults = userResults.slice(0, 3);
-  if (topResults.length === 0) {
+  if (results.length === 0) {
     throw new AppError("No relevant content found in your document", 404);
   }
 
-  // Format results
+  // Format results (already filtered by Pinecone natively)
   return {
-    documents: [topResults.map((r) => r.pageContent)],
-    ids: [topResults.map((r) => r.metadata?.id || "")],
-    metadatas: [topResults.map((r) => r.metadata || {})],
+    documents: [results.map((r) => r.pageContent)],
+    ids: [results.map((r) => r.id || "")],
+    metadatas: [results.map((r) => r.metadata || {})],
   };
 }
