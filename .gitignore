@@ -1,2 +1,15 @@
 node_modules
 .env
+.cursor
+.cursor/plans
+.cursor/debug.log
+.cursor/debug.log.*
+.cursor/debug.log.*.*
+.cursor/debug.log.*.*.*
+.cursor/debug.log.*.*.*.*
+.cursor/debug.log.*.*.*.*.*
+.cursor/debug.log.*.*.*.*.*.*
+.cursor/debug.log.*.*.*.*.*.*.*
+.cursor/debug.log.*.*.*.*.*.*.*.*
+script.js
+ai-snapshot.json

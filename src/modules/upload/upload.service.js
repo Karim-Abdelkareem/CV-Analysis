@@ -58,12 +58,22 @@ async function processDocumentBuffer(fileBuffer, fileType, userId, fileName) {
     await deleteUserDocument(userId, user.document.chunksIds);
   }
 
-  // Store in Pinecone with user-specific IDs
+  // Store in Pinecone with user-specific IDs and metadata
   const vectorStore = await getVectorStore();
   const timestamp = Date.now();
   const ids = chunks.map((_, i) => `user_${userId}_${timestamp}_${i}`);
 
-  const storedIds = await vectorStore.addDocuments(chunks, { ids });
+  // Add metadata to each chunk for Pinecone native metadata filtering
+  const chunksWithMetadata = chunks.map((chunk) => ({
+    ...chunk,
+    metadata: {
+      ...chunk.metadata,
+      userId: userId.toString(),
+      docType: "cv",
+    },
+  }));
+
+  const storedIds = await vectorStore.addDocuments(chunksWithMetadata, { ids });
 
   // Update user document info
   await user.updateDocument(storedIds, fileName, fileType);
